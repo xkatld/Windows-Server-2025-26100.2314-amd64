@@ -1,0 +1,37 @@
+name: Build UUP ISO
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y aria2 cabextract wimtools chntpw genisoimage
+
+      - name: Make Script Executable
+        run: chmod +x ./uup_download_linux.sh
+
+      - name: Run Build Script
+        run: ./uup_download_linux.sh
+
+      - name: Upload ISO as Artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-Server-2025-26100.2314-amd64
+          path: |
+            *.ISO
+            *.iso
+          if-no-files-found: error
